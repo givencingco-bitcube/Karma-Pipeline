@@ -38,7 +38,7 @@ resource "aws_codebuild_project" "bitcube_codebuild" {
 
   service_role = aws_iam_role.codebuild_default_role.arn
 
-    artifacts {
+  artifacts {
     type = "NO_ARTIFACTS"
   }
 

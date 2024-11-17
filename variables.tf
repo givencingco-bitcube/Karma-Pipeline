@@ -45,4 +45,10 @@ variable "github_url" {
 
 variable "app_name" {
   default = "KarmahCodeBuild"
+  type    = string
+}
+
+variable "ami" {
+  type    = string
+  default = "ami-012967cc5a8c9f891"
 }

@@ -130,8 +130,8 @@ resource "aws_iam_role_policy_attachment" "attach_ec2_ssm_policy" {
 }
 
 #Create an IAM Instance Profile to be used by EC2
-resource "aws_iam_instance_profile" "bitcube_ec2_instance_profile" {
-  name = "BitcubeEC2InstanceProfile"
+resource "aws_iam_instance_profile" "karmah_ec2_instance_profile" {
+  name = "karmahEC2InstanceProfile"
   role = aws_iam_role.karmah_ec2_service_role.name
 }
 
