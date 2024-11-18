@@ -4,7 +4,7 @@ module "ec2_instance" {
 
   name = "karmah-ec2"
 
-  instance_type               = "t2.micro"
+  instance_type               = "t3.small"
   key_name                    = data.aws_key_pair.key_name.key_name
   monitoring                  = false
   vpc_security_group_ids      = [module.bitcube_ec2_sg.security_group_id]
@@ -13,7 +13,32 @@ module "ec2_instance" {
   ami                         = var.ami
   iam_instance_profile        = aws_iam_instance_profile.karmah_ec2_instance_profile.name
 
-  user_data = file("public _user-data.sh")
+  user_data = <<-EOF
+                    #!/bin/bash
+                    set -e  # Exit immediately if a command exits with a non-zero status
+
+                    # Update the instance
+                    sudo yum update -y
+
+                    # Install necessary packages
+                    sudo yum install -y ruby wget
+
+                    # Install Docker
+                    sudo yum -y install docker
+                    sudo service docker start
+                    sudo systemctl enable docker
+                    sudo usermod -a -G docker ec2-user
+                    sudo chmod 666 /var/run/docker.sock
+
+                    # Install CodeDeploy agent
+                    cd /home/ec2-user
+                    wget https://aws-codedeploy-us-east-1.s3.amazonaws.com/latest/install
+                    chmod +x ./install
+                    sudo ./install auto
+
+                    # Start the CodeDeploy agent service
+                    sudo service codedeploy-agent start
+EOF
   tags = {
     Name        = "karmah-ec2"
     Environment = "karmahCodeDeploy"
@@ -36,10 +61,10 @@ module "backend_ec2_instance" {
   ami                         = var.ami
   iam_instance_profile        = aws_iam_instance_profile.karmah_ec2_instance_profile.name
 
-  user_data = file("private_user_data.sh")
+  # user_data = file("private_user_data.sh")
 }
 
 /* ====== Key_pair ====== */
 data "aws_key_pair" "key_name" {
-  key_name = "karma_ec2_kp"  
+  key_name = "karma_ec2_kp"
 }
